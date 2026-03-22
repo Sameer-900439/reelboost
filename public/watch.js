@@ -24,6 +24,9 @@
   const timerText        = document.getElementById('timerText');
   const confirmBtn       = document.getElementById('confirmBtn');
   const logoutBtn        = document.getElementById('logoutBtn');
+  
+  const likeVerification = document.getElementById('likeVerification');
+  const likedCheckbox    = document.getElementById('likedCheckbox');
 
   let currentOwnerEmail = null;
   let timerInterval = null;
@@ -91,6 +94,9 @@
   function resetTimer() {
     clearInterval(timerInterval);
     timerSection.style.display = 'none';
+    if (likeVerification) likeVerification.style.display = 'none';
+    if (likedCheckbox) likedCheckbox.checked = false;
+    
     confirmBtn.disabled = true;
     confirmBtn.classList.remove('ready');
     confirmBtn.querySelector('.btn-text').textContent = '⏳ Watch the reel first...';
@@ -121,12 +127,19 @@
 
   reelOpenLink.addEventListener('click', () => {
     if (!timerInterval || timerSection.style.display === 'none') {
+      if (likeVerification) likeVerification.style.display = 'block';
       startTimer();
     }
   });
 
   confirmBtn.addEventListener('click', async () => {
     if (confirmBtn.disabled || !currentOwnerEmail) return;
+    
+    if (likedCheckbox && !likedCheckbox.checked) {
+      alert("⚠️ You must verify that you Liked the reel on Instagram before claiming your credit!");
+      return;
+    }
+
     confirmBtn.disabled = true;
     confirmBtn.querySelector('.btn-text').textContent = '⏳ Confirming...';
 

@@ -456,9 +456,14 @@ router.post('/update-reel', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
 
+    if (user.credits < 5) {
+      return res.status(400).json({ success: false, message: 'You need at least 5 credits to update your Reel link!' });
+    }
+
+    user.credits -= 5;
     user.reelUrl = reelUrl.trim();
     await user.save();
-    return res.json({ success: true, message: 'Reel updated successfully.' });
+    return res.json({ success: true, message: 'Reel updated! (Cost: 5 Credits)' });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Server error updating reel.' });
   }
