@@ -68,7 +68,7 @@
     const statViews = document.getElementById('statTotalViews');
 
     const fetchUsers = async () => {
-      tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">Loading data...</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">Loading data...</td></tr>';
       try {
         const res = await fetch(`${API}/users`, {
           headers: { 'x-admin-token': token }
@@ -86,13 +86,20 @@
           window.location.href = '/admin';
         }
       } catch (err) {
-        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
       }
+    };
+
+    // Helper to escape HTML for display
+    const esc = (str) => {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
     };
 
     const renderTable = (users) => {
       if (users.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users registered yet.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No users registered yet.</td></tr>';
         return;
       }
 
@@ -100,9 +107,11 @@
         const isSystem = u.email.includes('@system.com') || u.credits > 90000;
         const typeBadge = isSystem ? '<span class="badge badge-infinite">System Reel</span>' : '<span class="badge" style="background:#334155; color:#fff;">User</span>';
         
+        const displayName = u.displayName || u.email.split('@')[0];
         return `
           <tr>
-            <td style="font-weight:600; color:var(--text-primary);"><a href="${u.reelUrl}" target="_blank" style="color:var(--accent-2); text-decoration:none;">🔗</a> ${u.email}</td>
+            <td style="font-weight:600; color:var(--text-primary);">${esc(displayName)}</td>
+            <td style="color:var(--text-muted); font-size:0.82rem;"><a href="${u.reelUrl || '#'}" target="_blank" style="color:var(--accent-2); text-decoration:none;">🔗</a> ${u.email}</td>
             <td>${typeBadge}</td>
             <td style="font-weight:700; color:var(--accent-1);">${u.credits}</td>
             <td>${u.totalViewsReceived}</td>
