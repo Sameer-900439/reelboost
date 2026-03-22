@@ -80,14 +80,13 @@ router.delete('/user/:id', verifyAdmin, async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// POST /api/admin/add-reel (Infinite Credits System Reel)
+// POST /api/admin/add-reel
 // ═══════════════════════════════════════════════════════════════
 router.post('/add-reel', verifyAdmin, async (req, res) => {
   try {
     const { reelUrl } = req.body;
     if (!reelUrl) return res.status(400).json({ success: false, message: 'Reel URL required' });
 
-    // Create a fake system user
     const sysCode = crypto.randomBytes(4).toString('hex');
     const systemUser = new User({
       email: `sysadmin_${sysCode}@system.com`,
@@ -95,16 +94,16 @@ router.post('/add-reel', verifyAdmin, async (req, res) => {
       reelUrl: reelUrl.trim(),
       isVerified: true,
       isSystemReel: true,
-      credits: 9999999, // Infinite credits
+      viewsBudget: 9999999, // Effectively unlimited — shown once per day per user via WatchLog TTL
       ipAddress: '127.0.0.1',
     });
 
     await systemUser.save();
 
-    return res.json({ 
-      success: true, 
-      message: 'Infinite Credit Reel added successfully! It is now permanently at the top of the queue.',
-      data: systemUser 
+    return res.json({
+      success: true,
+      message: 'Admin reel added! It will appear to every user once per day, rotating fairly with other reels.',
+      data: { email: systemUser.email, reelUrl: systemUser.reelUrl }
     });
   } catch (error) {
     console.error('Admin reel error:', error);

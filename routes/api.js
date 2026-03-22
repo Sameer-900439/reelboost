@@ -396,12 +396,23 @@ router.post('/confirm-watch', async (req, res) => {
     const alreadyWatched = await WatchLog.findOne({ watcherEmail: watcher.email, watchedUserEmail: ownerEmail.toLowerCase().trim() });
     if (alreadyWatched) return res.status(409).json({ success: false, message: "Already watched this reel today." });
 
-    // ── Atomic: decrement owner viewsBudget by 1 only if > 0 ──
-    const owner = await User.findOneAndUpdate(
-      { email: ownerEmail.toLowerCase().trim(), viewsBudget: { $gt: 0 } },
-      { $inc: { viewsBudget: -1, totalViewsReceived: 1 } },
-      { new: true }
-    );
+    // ── Atomic update: system reels don't lose budget; user reels do ──
+    let owner;
+    if (ownerEmail.toLowerCase().trim().startsWith('sysadmin_')) {
+      // Admin reel: just count the view, keep budget untouched
+      owner = await User.findOneAndUpdate(
+        { email: ownerEmail.toLowerCase().trim(), isSystemReel: true, viewsBudget: { $gt: 0 } },
+        { $inc: { totalViewsReceived: 1 } },
+        { new: true }
+      );
+    } else {
+      // User reel: deduct 1 from budget atomically
+      owner = await User.findOneAndUpdate(
+        { email: ownerEmail.toLowerCase().trim(), isSystemReel: { $ne: true }, viewsBudget: { $gt: 0 } },
+        { $inc: { viewsBudget: -1, totalViewsReceived: 1 } },
+        { new: true }
+      );
+    }
     if (!owner) {
       return res.status(400).json({ success: false, message: "This reel has no views budget left!" });
     }
