@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReelBoost — Free Instagram Reel Views Exchange</title>
+  <meta name="description" content="Get free Instagram Reel views by watching other creators' reels. No payment required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google AdSense — Replace ca-pub-XXXXXXXXXXXXXXXX with your publisher ID -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+  <!-- Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+  <div class="bg-particles" aria-hidden="true">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <main class="container">
+    <!-- Hero -->
+    <header class="hero">
+      <div class="badge">🔄 Watch & Earn — 100% Free</div>
+      <h1>Get <span class="gradient-text">Free Reel Views</span> from Real People</h1>
+      <p class="subtitle">
+        Join our community of creators. Watch other reels to earn credits,
+        then <strong>spend credits to get views</strong> on your own reels.
+      </p>
+    </header>
+
+    <!-- Auth Card -->
+    <section class="card" id="authCard">
+      <!-- Step 1: Email Entry -->
+      <div id="step1" class="auth-step">
+        <h2 class="card-title">Get Started</h2>
+
+        <!-- Google Sign-In Button -->
+        <div class="google-signin-wrapper">
+          <div id="googleBtnContainer"></div>
+          <p class="or-divider"><span>or continue with email</span></p>
+        </div>
+
+        <form id="emailForm" novalidate>
+          <div class="input-group" id="emailGroup">
+            <label for="email">Email Address</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required />
+            </div>
+            <span class="error-text" id="emailError"></span>
+          </div>
+          <button type="submit" id="sendOtpBtn" class="btn-submit">
+            <span class="btn-text">📧 Send Verification Code</span>
+            <span class="btn-loader" aria-hidden="true">
+              <svg class="spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" /></svg>
+              Sending...
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Step 2: OTP Verification -->
+      <div id="step2" class="auth-step" style="display:none;">
+        <h2 class="card-title">Verify Your Email</h2>
+        <p class="otp-sent-to">Enter the 6-digit code sent to <strong id="otpEmail">—</strong></p>
+        <form id="otpForm" novalidate>
+          <div class="otp-input-group">
+            <input type="text" id="otpCode" class="otp-input" maxlength="6" placeholder="000000" autocomplete="one-time-code" inputmode="numeric" required />
+          </div>
+          <span class="error-text" id="otpError"></span>
+          <button type="submit" id="verifyOtpBtn" class="btn-submit">
+            <span class="btn-text">✅ Verify Code</span>
+            <span class="btn-loader" aria-hidden="true">
+              <svg class="spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" /></svg>
+              Verifying...
+            </span>
+          </button>
+          <button type="button" id="resendBtn" class="btn-text-link" style="margin-top:10px;">Resend Code</button>
+          <button type="button" id="changeEmailBtn" class="btn-text-link">← Change Email</button>
+        </form>
+      </div>
+
+      <!-- Step 3: Reel URL (for new users) -->
+      <div id="step3" class="auth-step" style="display:none;">
+        <h2 class="card-title">Almost There! 🎉</h2>
+        <p class="card-desc">Your email is verified! Now paste your Instagram Reel link to start getting views.</p>
+        <form id="reelForm" novalidate>
+          <div class="input-group" id="urlGroup">
+            <label for="reelUrl">Your Instagram Reel URL</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <circle cx="12" cy="12" r="5" />
+                <circle cx="17.5" cy="6.5" r="1.5" />
+              </svg>
+              <input type="url" id="reelUrl" placeholder="https://www.instagram.com/reel/ABC123/" autocomplete="off" required />
+            </div>
+            <span class="error-text" id="urlError"></span>
+          </div>
+
+          <div class="input-group" id="refGroup">
+            <label for="referralCode">Referral Code <span class="optional">(optional)</span></label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M14 21H2v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2zM10 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" />
+              </svg>
+              <input type="text" id="referralCode" placeholder="e.g. A1B2C3D4" autocomplete="off" maxlength="8" />
+            </div>
+          </div>
+
+          <button type="submit" id="completeBtn" class="btn-submit">
+            <span class="btn-text">🚀 Start Earning Views</span>
+            <span class="btn-loader" aria-hidden="true">
+              <svg class="spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" /></svg>
+              Creating Account...
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Step Admin (Password Input) -->
+      <div id="stepAdmin" class="auth-step" style="display:none;">
+        <h2 class="card-title">Admin Access</h2>
+        <p class="otp-sent-to">Enter administrator password</p>
+        <form id="adminPassForm" novalidate>
+          <div class="input-group">
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <input type="password" id="adminPassInput" placeholder="••••••••" required />
+            </div>
+          </div>
+          <span class="error-text" id="adminPassError"></span>
+          <button type="submit" id="adminPassBtn" class="btn-submit" style="margin-top:16px;">
+            <span class="btn-text">🔐 Login to Dashboard</span>
+          </button>
+          <button type="button" class="btn-text-link" onclick="location.reload()" style="margin-top:10px;">← Cancel</button>
+        </form>
+      </div>
+
+      <div id="resultArea" class="result-area" aria-live="polite"></div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Verify Email</h3>
+          <p>Sign up with Google or verify your email via OTP</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Watch Reels</h3>
+          <p>Watch other creators' reels to earn 1 credit per watch</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Get Views</h3>
+          <p>Other users watch your reel — you get real views!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <h3>Verified Users Only</h3>
+        <p>Every user is email-verified. No bots, no fake accounts.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">👥</div>
+        <h3>Real Views</h3>
+        <p>Views from real Instagram users, not bots or fake accounts.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎁</div>
+        <h3>Referral Bonus</h3>
+        <p>Invite friends and earn +3 bonus credits per referral!</p>
+      </div>
+    </section>
+
+    <!-- Ad Slot -->
+    <div class="ad-container" id="ad-landing">
+      <div class="ad-placeholder">
+        <span class="ad-label">Advertisement</span>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>&copy; 2026 ReelBoost. Community-powered reel views exchange.</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

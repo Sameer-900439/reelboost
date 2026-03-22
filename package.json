@@ -1,0 +1,23 @@
+{
+  "name": "instagram-reel-views",
+  "version": "1.0.0",
+  "description": "Free Instagram Reel Views - Lead Generation Tool",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "google-auth-library": "^10.6.2",
+    "mongoose": "^8.6.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^8.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

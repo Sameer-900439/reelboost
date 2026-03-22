@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Watch & Earn — ReelBoost</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="bg-particles" aria-hidden="true">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="/" class="nav-logo">⚡ ReelBoost</a>
+    <div class="nav-links">
+      <a href="/dashboard" class="nav-btn">📊 Dashboard</a>
+      <a href="/" class="nav-btn" id="logoutBtn">Logout</a>
+    </div>
+  </nav>
+
+  <main class="container watch-container">
+    <!-- Credits Bar -->
+    <div class="credits-bar">
+      <div class="credits-display">
+        <span class="credits-icon">💎</span>
+        <span>Your Credits: <strong id="creditCount">0</strong></span>
+      </div>
+      <div class="watched-display">
+        Today: <strong id="watchedCount">0</strong><span id="dailyLimitDisplay"> / 5</span>
+      </div>
+    </div>
+
+    <!-- Watch Card -->
+    <section class="card watch-card" id="watchCard">
+      <!-- State: Loading -->
+      <div id="stateLoading" class="watch-state">
+        <div class="watch-loading">
+          <svg class="spinner-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" /></svg>
+          <p>Finding a reel for you...</p>
+        </div>
+      </div>
+
+      <!-- State: Reel Ready -->
+      <div id="stateReel" class="watch-state" style="display:none;">
+        <h2 class="card-title">Watch This Reel</h2>
+        <p class="watch-instructions">Click the button below to open the reel on Instagram. Watch it fully, then come back and confirm.</p>
+
+        <a href="#" target="_blank" id="reelOpenLink" class="btn-open-reel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+            <circle cx="12" cy="12" r="5" />
+            <circle cx="17.5" cy="6.5" r="1.5" />
+          </svg>
+          Open Reel on Instagram
+        </a>
+
+        <!-- Timer -->
+        <div class="timer-section" id="timerSection" style="display:none;">
+          <div class="timer-ring">
+            <svg viewBox="0 0 100 100">
+              <circle class="timer-bg" cx="50" cy="50" r="42" />
+              <circle class="timer-progress" id="timerProgress" cx="50" cy="50" r="42" />
+            </svg>
+            <span class="timer-text" id="timerText">15</span>
+          </div>
+          <p class="timer-label">Watch the reel, then confirm below</p>
+        </div>
+
+        <!-- Confirm Button (hidden until timer finishes) -->
+        <button id="confirmBtn" class="btn-submit confirm-btn" disabled>
+          <span class="btn-text">⏳ Watch the reel first...</span>
+        </button>
+      </div>
+
+      <!-- State: No Reels -->
+      <div id="stateEmpty" class="watch-state" style="display:none;">
+        <div class="empty-state">
+          <div class="empty-icon">🎉</div>
+          <h3>You've Watched All Available Reels!</h3>
+          <p>Invite more friends to join and unlock new reels to watch.</p>
+          <a href="/dashboard" class="btn-submit" style="display:inline-flex; width:auto; padding:0 32px;">
+            <span class="btn-text">Go to Dashboard</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- State: Daily Limit Reached -->
+      <div id="stateDailyLimit" class="watch-state" style="display:none;">
+        <div class="empty-state">
+          <div class="empty-icon">⏳</div>
+          <h3>Daily Limit Reached!</h3>
+          <p>You can watch 100 reels per day. Come back tomorrow!</p>
+          <a href="/dashboard" class="btn-submit" style="display:inline-flex; width:auto; padding:0 32px;">
+            <span class="btn-text">Go to Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ad Slot (High revenue — users see this during 15s timer!) -->
+    <div class="ad-container" id="ad-watch">
+      <div class="ad-placeholder">
+        <span class="ad-label">Advertisement</span>
+        <!-- <ins class="adsbygoogle" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins> -->
+      </div>
+    </div>
+  </main>
+
+  <script src="watch.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — ReelBoost</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .admin-container { max-width: 1000px; padding-top: 40px; }
+    .table-container { overflow-x: auto; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 20px; }
+    table { width: 100%; border-collapse: collapse; color: var(--text-secondary); font-size: 0.9rem; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+    th { color: var(--text-primary); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; border-bottom: 2px solid var(--glass-border); }
+    tr:last-child td { border-bottom: none; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-infinite { background: rgba(168,85,247,0.2); color: #c084fc; }
+    .btn-action { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); border-radius: 4px; padding: 6px 12px; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; }
+    .btn-action:hover { background: var(--accent-1); border-color: var(--accent-1); }
+    .btn-danger { color: #ef4444; border-color: rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: #ef4444; color: #fff; }
+    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    
+    .add-reel-box { background: rgba(168,85,247,0.05); border: 1px solid rgba(168,85,247,0.2); padding: 20px; border-radius: var(--radius-md); margin-bottom: 24px; display: flex; gap: 12px; align-items: flex-end; }
+    .add-reel-box .input-group { flex: 1; margin: 0; }
+    #statsRow { display: flex; gap: 16px; margin-bottom: 24px; }
+    .stat-box { flex: 1; padding: 16px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); text-align: center; }
+    .stat-box h3 { font-size: 2rem; color: var(--accent-1); margin: 0; }
+    .stat-box p { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="nav-logo">⚡ Admin Panel</div>
+    <div class="nav-links">
+      <a href="#" class="nav-btn" id="logoutBtn">Log Out</a>
+    </div>
+  </nav>
+
+  <main class="container admin-container">
+    <div class="header-row">
+      <h2>Platform Overview</h2>
+      <button class="btn-action" id="refreshBtn">🔄 Refresh Data</button>
+    </div>
+
+    <div id="statsRow">
+      <div class="stat-box">
+        <h3 id="statTotalUsers">-</h3>
+        <p>Total Users</p>
+      </div>
+      <div class="stat-box">
+        <h3 id="statTotalViews">-</h3>
+        <p>Total Views Delivered</p>
+      </div>
+    </div>
+
+    <div class="add-reel-box">
+      <div class="input-group">
+        <label>Inject "Infinite Credit" Reel URL</label>
+        <div class="input-wrapper">
+          <input type="url" id="adminReelUrl" placeholder="https://www.instagram.com/reel/..." />
+        </div>
+      </div>
+      <button class="btn-submit" id="addReelBtn" style="width:auto; padding:0 30px; height:46px;">
+        <span class="btn-text">Inject Reel to Top</span>
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Type</th>
+            <th>Credits</th>
+            <th>Views Recv</th>
+            <th>Total Watched</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="7" style="text-align:center; padding:30px;">Loading users...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Credit Prompt Modal -->
+  <div id="creditModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:999; align-items:center; justify-content:center;">
+    <div class="card" style="width:100%; max-width:400px; padding:30px;">
+      <h3 style="margin-top:0;">Add Credits</h3>
+      <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Amount to add to: <br><strong id="modalEmail" style="color:var(--text-primary);"></strong></p>
+      
+      <div class="input-group">
+        <div class="input-wrapper">
+          <input type="number" id="modalAmount" value="50" style="padding-left:16px;" />
+        </div>
+      </div>
+      
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+        <button id="modalCancel" class="btn-action" style="padding:10px 24px;">Cancel</button>
+        <button id="modalConfirm" class="btn-submit" style="width:auto; padding:0 24px;"><span class="btn-text">Add</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

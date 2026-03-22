@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — ReelBoost</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="bg-particles" aria-hidden="true">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="/" class="nav-logo">⚡ ReelBoost</a>
+    <div class="nav-links">
+      <a href="/watch" class="nav-btn primary">👁️ Watch & Earn</a>
+      <a href="/" class="nav-btn" id="logoutBtn">Logout</a>
+    </div>
+  </nav>
+
+  <main class="container dashboard-container">
+    <!-- Welcome Header -->
+    <header class="dash-header">
+      <img id="userAvatar" class="dash-avatar" src="" alt="" style="display:none;" />
+      <h1>Your Dashboard</h1>
+      <p class="dash-email" id="userEmail">Loading...</p>
+      <div id="verifiedBadge" class="verified-badge">✅ Verified</div>
+    </header>
+
+    <!-- Daily Limit Info -->
+    <div class="daily-limit-bar" id="dailyLimitBar">
+      <span>Today's Watches: <strong id="dailyCount">0</strong> / <strong id="dailyLimit">100</strong></span>
+    </div>
+
+    <!-- Stats Grid -->
+    <section class="stats-grid">
+      <div class="stat-card accent-purple">
+        <div class="stat-value" id="statCredits">—</div>
+        <div class="stat-label">Credits Available</div>
+        <div class="stat-icon">💎</div>
+      </div>
+      <div class="stat-card accent-pink">
+        <div class="stat-value" id="statViews">—</div>
+        <div class="stat-label">Views Received</div>
+        <div class="stat-icon">👁️</div>
+      </div>
+      <div class="stat-card accent-blue">
+        <div class="stat-value" id="statWatched">—</div>
+        <div class="stat-label">Reels Watched</div>
+        <div class="stat-icon">🎬</div>
+      </div>
+      <div class="stat-card accent-green">
+        <div class="stat-value" id="statReferrals">—</div>
+        <div class="stat-label">Referrals</div>
+        <div class="stat-icon">🎁</div>
+      </div>
+    </section>
+
+    <!-- Your Reel -->
+    <section class="card">
+      <h2 class="card-title">📌 Your Reel</h2>
+      <p class="card-desc" style="margin-bottom:12px;">This is the reel other users will watch. You can update it anytime!</p>
+      <div class="input-group" style="display:flex; gap:10px;">
+        <div class="input-wrapper" style="flex:1;">
+          <input type="url" id="reelInput" placeholder="https://www.instagram.com/reel/..." style="padding-left:16px;" />
+        </div>
+        <button id="updateReelBtn" class="btn-submit" style="width:auto; padding:0 24px; height:46px;">
+          <span class="btn-text">Update</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Referral Section -->
+    <section class="card referral-card">
+      <h2 class="card-title">🎁 Invite Friends — Earn +50 Credits</h2>
+      <p class="card-desc">Share your unique referral link. When a friend signs up, you get a massive <strong>50 bonus credits</strong>!</p>
+      <div class="referral-box">
+        <div class="referral-code-display">
+          <span class="referral-label">Your Code:</span>
+          <span class="referral-code" id="referralCode">—</span>
+        </div>
+        <div class="referral-link-row">
+          <input type="text" id="referralLinkInput" class="referral-link-input" readonly />
+          <button id="copyBtn" class="btn-copy" title="Copy link">
+            <span id="copyText">📋 Copy</span>
+          </button>
+        </div>
+      </div>
+      
+      <div id="applyReferralBox" style="margin-top:24px; padding-top:24px; border-top:1px solid var(--glass-border);">
+        <h3 style="font-size:14px; margin-bottom:12px;">Were you referred by someone?</h3>
+        <div class="input-group" style="display:flex; gap:10px;">
+          <div class="input-wrapper" style="flex:1;">
+            <input type="text" id="applyReferralInput" placeholder="Enter their code here..." style="padding-left:16px;" />
+          </div>
+          <button id="applyReferralBtn" class="btn-submit" style="width:auto; padding:0 24px; height:46px;">
+            <span class="btn-text">Apply Code</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <a href="/watch" class="btn-submit cta-btn">
+        <span class="btn-text">👁️ Start Watching & Earning Credits</span>
+      </a>
+    </section>
+
+    <!-- Ad Slot -->
+    <div class="ad-container" id="ad-dashboard">
+      <div class="ad-placeholder">
+        <span class="ad-label">Advertisement</span>
+        <!-- <ins class="adsbygoogle" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins> -->
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <section class="card">
+      <h2 class="card-title">🏆 Top Creators</h2>
+      <div class="leaderboard" id="leaderboard">
+        <div class="loading-text">Loading leaderboard...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
