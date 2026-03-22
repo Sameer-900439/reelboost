@@ -34,10 +34,10 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
-  costPerView: {
+  viewsBudget: {
     type: Number,
-    default: 1,
-    min: 1,
+    default: 0,
+    min: 0,
   },
   referralCount: {
     type: Number,
@@ -116,7 +116,7 @@ userSchema.methods.checkPremiumStatus = function () {
   }
 };
 
-userSchema.index({ credits: -1 });
+userSchema.index({ viewsBudget: -1 });
 userSchema.index({ totalViewsReceived: -1 });
 userSchema.index({ isPremium: 1 });
 

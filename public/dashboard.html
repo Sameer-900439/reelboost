@@ -68,14 +68,14 @@
     <!-- Your Reel -->
     <section class="card">
       <h2 class="card-title">📌 Your Reel</h2>
-      <p class="card-desc" style="margin-bottom:12px;">This is the reel other users will watch. You can update it anytime! <strong>(Costs 5 Credits)</strong></p>
+      <p class="card-desc" style="margin-bottom:12px;">This is the reel other users will watch. Set how many views you want. <strong>💡 1 Credit = 2 Views</strong></p>
       
       <div style="margin-bottom:12px;">
-        <label for="costInput" style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.8;">Credits to Bid Per View:</label>
-        <div class="input-wrapper" style="margin-top:6px; max-width:150px;">
-          <input type="number" id="costInput" min="1" value="1" style="padding-left:16px;" />
+        <label for="viewsInput" style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.8;">How many views do you want?</label>
+        <div class="input-wrapper" style="margin-top:6px; max-width:180px;">
+          <input type="number" id="viewsInput" min="2" step="2" value="10" placeholder="e.g. 100" style="padding-left:16px;" />
         </div>
-        <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Bid more credits to push your reel to the top of the queue!</p>
+        <p id="creditCostPreview" style="font-size:12px; color:var(--text-muted); margin-top:4px;">Cost: 5 credits (1 credit = 2 views)</p>
       </div>
 
       <div class="input-group" style="display:flex; gap:10px;">

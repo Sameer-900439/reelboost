@@ -28,7 +28,8 @@
 
   // New additions
   const reelInput = document.getElementById('reelInput');
-  const costInput = document.getElementById('costInput');
+  const viewsInput = document.getElementById('viewsInput');
+  const creditCostPreview = document.getElementById('creditCostPreview');
   const updateReelBtn = document.getElementById('updateReelBtn');
   const applyReferralBox = document.getElementById('applyReferralBox');
   const applyReferralInput = document.getElementById('applyReferralInput');
@@ -71,8 +72,11 @@
       if (reelInput) {
         reelInput.value = d.reelUrl || '';
       }
-      if (costInput) {
-        costInput.value = d.costPerView || 1;
+      if (viewsInput && d.viewsBudget !== undefined) {
+        // Show remaining budget in the preview
+        if (creditCostPreview) {
+          creditCostPreview.textContent = `Views remaining in budget: ${d.viewsBudget} | 1 credit = 2 views`;
+        }
       }
 
       // Referral 
@@ -163,24 +167,43 @@
     window.location.href = '/';
   });
 
-  // ── Make API Calls ──
+  // ── Live credit cost preview ──
+  if (viewsInput && creditCostPreview) {
+    viewsInput.addEventListener('input', () => {
+      const v = parseInt(viewsInput.value, 10);
+      if (!isNaN(v) && v >= 2) {
+        const cost = Math.ceil(v / 2);
+        creditCostPreview.textContent = `Cost: ${cost} credit${cost !== 1 ? 's' : ''} for ${v} views`;
+      } else {
+        creditCostPreview.textContent = 'Enter at least 2 views';
+      }
+    });
+  }
+
+  // ── Update Reel ──
   if (updateReelBtn) {
     updateReelBtn.addEventListener('click', async () => {
       const reelUrl = reelInput.value.trim();
-      const costPerView = costInput ? parseInt(costInput.value, 10) : 1;
-      
-      if (!reelUrl) return alert('Enter a valid URL');
-      if (isNaN(costPerView) || costPerView < 1) return alert('Cost per view must be at least 1 credit.');
+      const viewsWanted = viewsInput ? parseInt(viewsInput.value, 10) : 0;
+
+      if (!reelUrl) return alert('Enter a valid Instagram Reel URL.');
+      if (isNaN(viewsWanted) || viewsWanted < 2) return alert('Enter at least 2 views.');
 
       updateReelBtn.classList.add('loading');
       try {
         const res = await fetch(`${API}/update-reel`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, reelUrl, costPerView })
+          body: JSON.stringify({ email, reelUrl, viewsWanted })
         });
         const data = await res.json();
         alert(data.message);
+        if (data.success && data.data) {
+          statCredits.textContent = data.data.credits;
+          if (creditCostPreview) {
+            creditCostPreview.textContent = `Views remaining in budget: ${data.data.viewsBudget} | 1 credit = 2 views`;
+          }
+        }
       } catch (err) {
         alert('Connection error');
       }

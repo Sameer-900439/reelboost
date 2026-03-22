@@ -83,8 +83,7 @@
 
       currentOwnerEmail = data.data.ownerEmail;
       reelOpenLink.href = data.data.reelUrl;
-      const reward = data.data.reward || 1;
-      if (rewardBadge) rewardBadge.textContent = `💎 Reward: +${reward} Credit${reward > 1 ? 's' : ''}`;
+      if (rewardBadge) rewardBadge.textContent = `💎 Reward: +1 Credit`;
 
       showState('reel');
     } catch (err) {

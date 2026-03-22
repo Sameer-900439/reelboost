@@ -9,10 +9,10 @@ const { sendOTP } = require('../services/emailService');
 const INSTAGRAM_URL_REGEX = /^https?:\/\/(www\.)?instagram\.com\/(reel|reels|p)\/[\w-]+\/?(\?.*)?$/i;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const REFERRAL_BONUS = 50; // Worth 50 views
+const REFERRAL_BONUS = 50;
 const FREE_DAILY_LIMIT = 100;
-const WATCH_REWARD = 2; // Earn 2 credits per watch
-const VIEW_COST = 1;    // Cost 1 credit per view received
+const WATCH_REWARD = 1;  // Watcher earns 1 credit per watch
+const VIEWS_PER_CREDIT = 2; // 1 credit = 2 views
 const OTP_EXPIRY_MINUTES = 5;
 const MAX_OTP_ATTEMPTS = 5;
 
@@ -284,7 +284,7 @@ router.get('/dashboard/:email', async (req, res) => {
         avatar: user.avatar,
         reelUrl: user.reelUrl,
         credits: user.credits,
-        costPerView: user.costPerView,
+        viewsBudget: user.viewsBudget,
         totalViewsReceived: user.totalViewsReceived,
         totalWatched: user.totalWatched,
         hasUsedReferral: user.hasUsedReferral,
@@ -333,14 +333,14 @@ router.get('/next-reel/:email', async (req, res) => {
       email: { $ne: email, $nin: watchedEmails },
       isVerified: true,
       isSystemReel: true,
-      $expr: { $gte: ["$credits", "$costPerView"] }
+      viewsBudget: { $gt: 0 }
     }).limit(10);
 
     if (adminCandidates.length > 0) {
       const pick = adminCandidates[Math.floor(Math.random() * adminCandidates.length)];
       return res.json({
         success: true,
-        data: { reelUrl: pick.reelUrl, ownerEmail: pick.email, reward: pick.costPerView },
+        data: { reelUrl: pick.reelUrl, ownerEmail: pick.email },
         watchCount: user.dailyWatchCount, dailyLimit: user.isPremium ? null : FREE_DAILY_LIMIT,
       });
     }
@@ -350,8 +350,8 @@ router.get('/next-reel/:email', async (req, res) => {
       email: { $ne: email, $nin: watchedEmails },
       isVerified: true,
       isSystemReel: { $ne: true },
-      $expr: { $gte: ["$credits", "$costPerView"] }
-    }).sort({ costPerView: -1, credits: -1 }).limit(10);
+      viewsBudget: { $gt: 0 }
+    }).sort({ viewsBudget: -1 }).limit(10);
 
     if (userCandidates.length === 0) {
       return res.json({
@@ -364,7 +364,7 @@ router.get('/next-reel/:email', async (req, res) => {
     const pick = userCandidates[Math.floor(Math.random() * userCandidates.length)];
     return res.json({
       success: true,
-      data: { reelUrl: pick.reelUrl, ownerEmail: pick.email, reward: pick.costPerView },
+      data: { reelUrl: pick.reelUrl, ownerEmail: pick.email },
       watchCount: user.dailyWatchCount, dailyLimit: user.isPremium ? null : FREE_DAILY_LIMIT,
     });
   } catch (error) {
@@ -384,9 +384,8 @@ router.post('/confirm-watch', async (req, res) => {
     }
 
     const watcher = await User.findOne({ email: watcherEmail.toLowerCase().trim() });
-    const owner = await User.findOne({ email: ownerEmail.toLowerCase().trim() });
-    if (!watcher || !owner) return res.status(404).json({ success: false, message: 'User not found.' });
-    if (watcher.email === owner.email) return res.status(400).json({ success: false, message: "Can't watch your own reel!" });
+    if (!watcher) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (watcher.email === ownerEmail.toLowerCase().trim()) return res.status(400).json({ success: false, message: "Can't watch your own reel!" });
 
     watcher.checkDailyReset();
     watcher.checkPremiumStatus();
@@ -394,31 +393,31 @@ router.post('/confirm-watch', async (req, res) => {
       return res.status(429).json({ success: false, error: 'daily_limit', dailyLimitReached: true, message: 'Daily limit reached.' });
     }
 
-    const alreadyWatched = await WatchLog.findOne({ watcherEmail: watcher.email, watchedUserEmail: owner.email });
-    if (alreadyWatched) return res.status(409).json({ success: false, message: "Already watched this reel." });
+    const alreadyWatched = await WatchLog.findOne({ watcherEmail: watcher.email, watchedUserEmail: ownerEmail.toLowerCase().trim() });
+    if (alreadyWatched) return res.status(409).json({ success: false, message: "Already watched this reel today." });
 
-    // Check if owner still has enough credits
-    if (owner.credits < owner.costPerView) {
-      return res.status(400).json({ success: false, message: "This reel's owner ran out of credits!" });
+    // ── Atomic: decrement owner viewsBudget by 1 only if > 0 ──
+    const owner = await User.findOneAndUpdate(
+      { email: ownerEmail.toLowerCase().trim(), viewsBudget: { $gt: 0 } },
+      { $inc: { viewsBudget: -1, totalViewsReceived: 1 } },
+      { new: true }
+    );
+    if (!owner) {
+      return res.status(400).json({ success: false, message: "This reel has no views budget left!" });
     }
 
+    // ── Record the watch log ──
     await WatchLog.create({ watcherEmail: watcher.email, watchedUserEmail: owner.email, reelUrl: owner.reelUrl });
 
-    // Watcher earns credits based on the owner's set costPerView
-    const earnedCredits = watcher.isPremium ? owner.costPerView * 2 : owner.costPerView;
-    watcher.credits += earnedCredits;
+    // ── Watcher earns credit ──
+    watcher.credits += WATCH_REWARD;
     watcher.totalWatched += 1;
     watcher.dailyWatchCount += 1;
     await watcher.save();
 
-    // Owner spends credits
-    owner.credits -= owner.costPerView;
-    owner.totalViewsReceived += 1;
-    await owner.save();
-
     return res.json({
       success: true,
-      message: `+${earnedCredits} credits earned!`,
+      message: `+${WATCH_REWARD} credit earned!`,
       data: {
         credits: watcher.credits, totalWatched: watcher.totalWatched,
         dailyWatchCount: watcher.dailyWatchCount, dailyLimit: watcher.isPremium ? null : FREE_DAILY_LIMIT,
@@ -470,27 +469,43 @@ router.get('/config', (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 router.post('/update-reel', async (req, res) => {
   try {
-    const { email, reelUrl, costPerView } = req.body;
+    const { email, reelUrl, viewsWanted } = req.body;
     if (!INSTAGRAM_URL_REGEX.test(reelUrl)) {
       return res.status(400).json({ success: false, message: 'Invalid Instagram Reel URL.' });
     }
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
 
-    const newCost = parseInt(costPerView, 10);
-    if (isNaN(newCost) || newCost < 1) {
-      return res.status(400).json({ success: false, message: 'Cost per view must be at least 1 credit.' });
+    const views = parseInt(viewsWanted, 10);
+    if (isNaN(views) || views < 2) {
+      return res.status(400).json({ success: false, message: 'You must request at least 2 views.' });
     }
 
-    if (user.credits < 5) {
-      return res.status(400).json({ success: false, message: 'You need at least 5 credits to update your Reel link!' });
+    // 1 credit = 2 views → cost = ceil(views / 2)
+    const creditCost = Math.ceil(views / 2);
+
+    // Atomically: deduct credits + update reel + add to viewsBudget — only if enough credits
+    const updatedUser = await User.findOneAndUpdate(
+      { email: email.toLowerCase().trim(), credits: { $gte: creditCost } },
+      {
+        $inc: { credits: -creditCost, viewsBudget: views },
+        $set: { reelUrl: reelUrl.trim() },
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      const user = await User.findOne({ email: email.toLowerCase().trim() });
+      if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+      return res.status(400).json({
+        success: false,
+        message: `Not enough credits! You need ${creditCost} credits for ${views} views. You have ${user.credits}.`,
+      });
     }
 
-    user.credits -= 5;
-    user.reelUrl = reelUrl.trim();
-    user.costPerView = newCost;
-    await user.save();
-    return res.json({ success: true, message: `Reel updated! Bidding ${newCost} credits/view. (Cost: 5 Credits)` });
+    return res.json({
+      success: true,
+      message: `✅ Done! ${views} views purchased for ${creditCost} credits. Remaining credits: ${updatedUser.credits}.`,
+      data: { credits: updatedUser.credits, viewsBudget: updatedUser.viewsBudget },
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Server error updating reel.' });
   }
