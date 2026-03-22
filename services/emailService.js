@@ -17,6 +17,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.GMAIL_USER ? process.env.GMAIL_USER.replace(/['"]/g, '').trim() : '',
     pass: process.env.GMAIL_APP_PASSWORD ? process.env.GMAIL_APP_PASSWORD.replace(/['"]/g, '').trim() : '',
   },
+  family: 4, // Force IPv4 to fix ENETUNREACH on Render
   connectionTimeout: 5000, // 5 seconds
   greetingTimeout: 5000,   // 5 seconds
   socketTimeout: 5000      // 5 seconds
