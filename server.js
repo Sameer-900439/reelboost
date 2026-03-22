@@ -69,6 +69,24 @@ app.use((err, req, res, next) => {
 // ── Start Server ──
 const startServer = async () => {
   await connectDB();
+
+  // ── One-time migration: rebuild WatchLog indexes for 24h TTL rotation ──
+  try {
+    const mongoose = require('mongoose');
+    const WatchLog = require('./models/WatchLog');
+    const collection = mongoose.connection.collection('watchlogs');
+    
+    // Drop all old indexes and let Mongoose recreate with TTL
+    await collection.dropIndexes();
+    await WatchLog.syncIndexes();
+    console.log('✅ WatchLog indexes synced (24h TTL rotation active)');
+  } catch (err) {
+    // Collection might not exist yet on fresh installs — that's fine
+    if (err.codeName !== 'NamespaceNotFound') {
+      console.warn('⚠️ WatchLog index sync warning:', err.message);
+    }
+  }
+
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running on http://localhost:${PORT}`);
     console.log(`📁 Frontend: http://localhost:${PORT}`);

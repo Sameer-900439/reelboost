@@ -324,25 +324,44 @@ router.get('/next-reel/:email', async (req, res) => {
       });
     }
 
+    // Get emails already watched today (WatchLog entries auto-delete after 24h)
     const watchedLogs = await WatchLog.find({ watcherEmail: email }).select('watchedUserEmail');
     const watchedEmails = watchedLogs.map((w) => w.watchedUserEmail);
 
-    // Only show reels from users who have enough credits to pay their own costPerView
-    const candidates = await User.find({
+    // ── Step 1: Try to find an unseen ADMIN reel (priority) ──
+    const adminCandidates = await User.find({
       email: { $ne: email, $nin: watchedEmails },
       isVerified: true,
+      isSystemReel: true,
       $expr: { $gte: ["$credits", "$costPerView"] }
-    }).sort({ costPerView: -1, credits: -1 }).limit(10);
+    }).limit(10);
 
-    if (candidates.length === 0) {
+    if (adminCandidates.length > 0) {
+      const pick = adminCandidates[Math.floor(Math.random() * adminCandidates.length)];
       return res.json({
-        success: true, data: null,
-        message: 'No more reels available. Invite friends!',
+        success: true,
+        data: { reelUrl: pick.reelUrl, ownerEmail: pick.email, reward: pick.costPerView },
         watchCount: user.dailyWatchCount, dailyLimit: user.isPremium ? null : FREE_DAILY_LIMIT,
       });
     }
 
-    const pick = candidates[Math.floor(Math.random() * candidates.length)];
+    // ── Step 2: Fall back to normal user reels ──
+    const userCandidates = await User.find({
+      email: { $ne: email, $nin: watchedEmails },
+      isVerified: true,
+      isSystemReel: { $ne: true },
+      $expr: { $gte: ["$credits", "$costPerView"] }
+    }).sort({ costPerView: -1, credits: -1 }).limit(10);
+
+    if (userCandidates.length === 0) {
+      return res.json({
+        success: true, data: null,
+        message: 'No more reels available right now. Come back later or invite friends!',
+        watchCount: user.dailyWatchCount, dailyLimit: user.isPremium ? null : FREE_DAILY_LIMIT,
+      });
+    }
+
+    const pick = userCandidates[Math.floor(Math.random() * userCandidates.length)];
     return res.json({
       success: true,
       data: { reelUrl: pick.reelUrl, ownerEmail: pick.email, reward: pick.costPerView },

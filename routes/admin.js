@@ -94,6 +94,7 @@ router.post('/add-reel', verifyAdmin, async (req, res) => {
       displayName: 'System Admin',
       reelUrl: reelUrl.trim(),
       isVerified: true,
+      isSystemReel: true,
       credits: 9999999, // Infinite credits
       ipAddress: '127.0.0.1',
     });
