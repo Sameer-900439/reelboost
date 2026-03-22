@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
+  costPerView: {
+    type: Number,
+    default: 1,
+    min: 1,
+  },
   referralCount: {
     type: Number,
     default: 0,

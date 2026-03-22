@@ -27,6 +27,7 @@
   
   const likeVerification = document.getElementById('likeVerification');
   const likedCheckbox    = document.getElementById('likedCheckbox');
+  const rewardBadge      = document.getElementById('rewardBadge');
 
   let currentOwnerEmail = null;
   let timerInterval = null;
@@ -84,6 +85,9 @@
 
       currentOwnerEmail = data.data.ownerEmail;
       reelOpenLink.href = data.data.reelUrl;
+      const reward = data.data.reward || 1;
+      if (rewardBadge) rewardBadge.textContent = `💎 Reward: +${reward} Credit${reward > 1 ? 's' : ''}`;
+
       showState('reel');
     } catch (err) {
       console.error('Load reel error:', err);
@@ -152,8 +156,7 @@
       const data = await res.json();
 
       if (data.success) {
-        const creditsEarned = data.data.isPremium ? 2 : 1;
-        showCreditPopup(`+${creditsEarned} Credit${creditsEarned > 1 ? 's' : ''} Earned! 💎`);
+        showCreditPopup(data.message);
         creditCount.textContent = data.data.credits;
         watchedCount.textContent = data.data.dailyWatchCount;
 

@@ -28,6 +28,7 @@
 
   // New additions
   const reelInput = document.getElementById('reelInput');
+  const costInput = document.getElementById('costInput');
   const updateReelBtn = document.getElementById('updateReelBtn');
   const applyReferralBox = document.getElementById('applyReferralBox');
   const applyReferralInput = document.getElementById('applyReferralInput');
@@ -69,6 +70,9 @@
       // Reel 
       if (reelInput) {
         reelInput.value = d.reelUrl || '';
+      }
+      if (costInput) {
+        costInput.value = d.costPerView || 1;
       }
 
       // Referral 
@@ -163,13 +167,17 @@
   if (updateReelBtn) {
     updateReelBtn.addEventListener('click', async () => {
       const reelUrl = reelInput.value.trim();
+      const costPerView = costInput ? parseInt(costInput.value, 10) : 1;
+      
       if (!reelUrl) return alert('Enter a valid URL');
+      if (isNaN(costPerView) || costPerView < 1) return alert('Cost per view must be at least 1 credit.');
+
       updateReelBtn.classList.add('loading');
       try {
         const res = await fetch(`${API}/update-reel`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, reelUrl })
+          body: JSON.stringify({ email, reelUrl, costPerView })
         });
         const data = await res.json();
         alert(data.message);
