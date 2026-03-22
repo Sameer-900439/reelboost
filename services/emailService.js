@@ -17,6 +17,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Verify SMTP connection on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ Gmail SMTP connection FAILED:', error.message);
+    console.error('   → Check GMAIL_USER and GMAIL_APP_PASSWORD in your env vars');
+  } else {
+    console.log(`✅ Gmail SMTP ready — sending from: ${process.env.GMAIL_USER}`);
+  }
+});
+
 /**
  * Send OTP verification email
  * @param {string} toEmail - Recipient email
@@ -51,7 +61,13 @@ const sendOTP = async (toEmail, code) => {
     return true;
   } catch (error) {
     console.error(`❌ Email send error to ${toEmail}:`, error.message);
-    throw new Error('Failed to send verification email. Please try again.');
+    // Surface the real error code to help diagnose
+    const reason = error.responseCode === 535
+      ? 'Gmail App Password is incorrect. Please regenerate it at myaccount.google.com/apppasswords'
+      : error.responseCode === 534
+      ? '2-Step Verification is not enabled on the Gmail account'
+      : error.message;
+    throw new Error(`Failed to send OTP: ${reason}`);
   }
 };
 
