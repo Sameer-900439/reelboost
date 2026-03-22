@@ -1,5 +1,5 @@
 const sendOTP = async (toEmail, code) => {
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYJF1H-o7ds6glYWqUBmPym9q8yyaDus7wVTWV_wgSfG4e7kRmFV7xR9NLPDL9rDBRuw/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKh_Anj51GWVYGRqmzUI39bmUCta5LRlooOTThp3CIeTqOEOTcNsoMS-cM-KSGzHU1GQ/exec";
 
   try {
     const response = await fetch(APPS_SCRIPT_URL, {
